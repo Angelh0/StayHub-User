@@ -4,33 +4,37 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.management.relation.Role;
-import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
-@Entity
+
+@NamedQuery(name = "UserEntity.findByEmail", query = "select u from UserEntity u where u.email = :email")
+
 @Getter
 @Setter
+@Entity
 @Table(name = "USER_TABLE")
 public class UserEntity {
 
     @Id
-    @GeneratedValue
     private UUID uuidUser;
 
-    private String username;
-    private String email;
-    private String password;
-    .
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
+    @Column(name = "name")
+    private String firstName;
 
-    private Set<Role> roles;
-    private String googleId;
-    private boolean enabled;
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime updatedAt;
+    @Column(name = "lastName")
+    private String lastName;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "role")
+    private String role;
+
+    @Column(name = "status")
+    private String status;
 
     @PrePersist
     public void generatedUuid() {
