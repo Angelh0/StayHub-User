@@ -1,6 +1,7 @@
 package com.angelh0.stayhub_user.exception;
 
 import com.angelh0.stayhub_user.exception.error.ExistEmail;
+import com.angelh0.stayhub_user.exception.error.ExistUser;
 import com.angelh0.stayhub_user.exception.error.InvalidValues;
 import com.angelh0.stayhub_user.exception.error.NotFoundException;
 import org.apache.coyote.Response;
@@ -37,6 +38,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExistEmail.class)
     public ResponseEntity<ErrorResponse> existEmail(ExistEmail e) {
         ErrorResponse errorResponse = new ErrorResponse("EXIST_EMAIL",
+                e.getMessage(),
+                HttpStatus.CONFLICT,
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ExistUser.class)
+    public ResponseEntity<ErrorResponse> existEmail(ExistUser e) {
+        ErrorResponse errorResponse = new ErrorResponse("EXIST_USER",
                 e.getMessage(),
                 HttpStatus.CONFLICT,
                 LocalDateTime.now()

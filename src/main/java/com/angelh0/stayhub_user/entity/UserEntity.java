@@ -36,6 +36,9 @@ public class UserEntity {
     @Column(name = "status")
     private String status;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private OwnerEntity ownerUser;
+
     @PrePersist
     public void generatedUuid() {
         if (uuidUser == null) {

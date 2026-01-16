@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService {
     private JwtUtil jwtUtil;
 
     @Override  // registrar usuario
-    public ResponseEntity<String> signUp(Map<String, String> requestMap) {
+    public ResponseEntity<String> signUpUser(Map<String, String> requestMap) {
 
         try {
             if (validateSingUp(requestMap)) {
@@ -75,10 +76,9 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(requestMap.get("firstName"));
         user.setLastName(requestMap.get("lastName"));
         user.setEmail(requestMap.get("email"));
-        user.setUuidUser(UUID.fromString(requestMap.get("uuidUser")));
         user.setPassword(passwordEncoder.encode(requestMap.get("password")));
         user.setRole("user");
-        user.setStatus("false");
+        user.setStatus("true");
 
         return user;
     }
@@ -96,8 +96,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(Map<String, String> requestMap) {
-        log.info("Dentro de login");
-
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -107,23 +105,28 @@ public class UserServiceImpl implements UserService {
             );
 
             if (authentication.isAuthenticated()) {
-                if (customerDetailsService.getUserDetail().getStatus().equalsIgnoreCase("true")) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                UserEntity userEntity = userRepository.findByEmail(userDetails.getUsername());
 
-                    String token = jwtUtil.generateToken(
-                            customerDetailsService.getUserDetail().getEmail(),
-                            customerDetailsService.getUserDetail().getRole(),
-                            customerDetailsService.getUserDetail().getUuidUser(),
-                            String.valueOf(customerDetailsService.getUserDetail().getUuidUser())
-                    );
-
-                    return "{\"token\": \"" + token + "\"}";
+                if (!userEntity.getStatus().equalsIgnoreCase("true")) {
+                    return "{\"mensaje\": \"Usuario no activado\"}";
                 }
+
+                String token = jwtUtil.generateToken(
+                        userEntity.getEmail(),
+                        userEntity.getRole(),
+                        userEntity.getUuidUser(),
+                        String.valueOf(userEntity.getUuidUser())
+                );
+
+                return "{\"token\": \"" + token + "\"}";
             }
 
         } catch (Exception e) {
-            log.error("{}", e);
+            log.error("Error en login: {}", e.getMessage());
         }
 
         return "{\"mensaje\": \"Credenciales incorrectas\"}";
     }
+
 }

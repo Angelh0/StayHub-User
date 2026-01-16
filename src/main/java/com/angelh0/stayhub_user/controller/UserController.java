@@ -19,7 +19,7 @@ public class UserController {
 
     @PostMapping("/signUp") // registro
     public ResponseEntity<String> signUser(@RequestBody Map<String, String> requestMap) {
-        return userService.signUp(requestMap);
+        return userService.signUpUser(requestMap);
     }
 
     @PostMapping("/login")

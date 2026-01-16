@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -25,32 +26,39 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private CustomerDetailsService customerDetailsService;
 
-    private String username = null;
     Claims claims = null;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().matches("/user/login|user/forgotPassword|/user/signup")) {
+
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
-        } else {
-            String authorizationHeader = request.getHeader("Authorization");
-            String token = null;
+            return;
+        }
 
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                token = authorizationHeader.substring(7);
-                username = jwtUtil.extractUsername(token);
-                claims = jwtUtil.extractAllClaims(token);
+        String jwt = authHeader.substring(7);
+        String username;
+
+        try {
+            username = jwtUtil.extractUsername(jwt);
+        }catch (Exception e) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            UserDetails userDetails = customerDetailsService.loadUserByUsername(username);
+
+            if (jwtUtil.validateToken(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = customerDetailsService.loadUserByUsername(username);
-                if (jwtUtil.validateToken(token,userDetails)) {
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    new WebAuthenticationDetailsSource().buildDetails(request);
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                }
-            }
             filterChain.doFilter(request, response);
         }
     }
@@ -61,9 +69,5 @@ public class JwtFilter extends OncePerRequestFilter {
 
     public Boolean isUser() {
         return "user".equalsIgnoreCase((String) claims.get("role"));
-    }
-
-    public String getCurrentUser() {
-        return username;
     }
 }
