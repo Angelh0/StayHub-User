@@ -17,7 +17,8 @@ public class OwnerEntity {
     private UUID uuidUser;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_uuid")
+    @MapsId
+    @JoinColumn(name = "uuid_user")
     private UserEntity user;
 
     @Column(name = "city")

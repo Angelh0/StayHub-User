@@ -13,6 +13,5 @@ public class OwnerDTO {
     private String city;
     private String phoneNumber;
     private String role;
-    private String email;
     private String status;
 }
