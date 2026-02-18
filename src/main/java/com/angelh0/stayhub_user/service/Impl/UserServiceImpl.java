@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
                 if (Objects.isNull(userEntity)) {
                     UserEntity user = getUser(requestMap);
                     user.setRole("USER");
-                    user.setStatus("true");
+                    user.setStatus("TRUE");
                     userRepository.save(getUser(requestMap));
                     return new ResponseEntity<>("Usuario registrado con éxito", HttpStatus.CREATED);
                 }
@@ -77,8 +77,8 @@ public class UserServiceImpl implements UserService {
         user.setLastName(requestMap.get("lastName"));
         user.setEmail(requestMap.get("email"));
         user.setPassword(passwordEncoder.encode(requestMap.get("password")));
-        user.setRole("user");
-        user.setStatus("true");
+        user.setRole("USER");
+        user.setStatus("TRUE");
 
         return user;
     }

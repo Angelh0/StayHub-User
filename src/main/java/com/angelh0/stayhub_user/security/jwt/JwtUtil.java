@@ -27,6 +27,11 @@ public class JwtUtil {
         return extractClaims(token, Claims::getExpiration);
     }
 
+    public String extractUuidUser(String token) {
+        Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return claims.get("userUUID", String.class);
+    }
+
     public <T> T extractClaims(String token, Function<Claims, T> resolveClaims) {
         final Claims claims = extractAllClaims(token);
         return resolveClaims.apply(claims);

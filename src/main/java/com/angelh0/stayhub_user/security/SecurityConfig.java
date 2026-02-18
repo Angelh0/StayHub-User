@@ -35,20 +35,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(request ->
-                        new CorsConfiguration().applyPermitDefaultValues()
+
+                .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()
                 ))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/signUp", "/api/v1/login", "/api/v1/forgotPassword", "/h2-console-User/**").permitAll()
-                        .anyRequest().authenticated()
+
+                        .requestMatchers("/api/v1/signUp", "/api/v1/login", "/api/v1/forgotPassword", "/h2-console-User/**", "/api/v1/SignUpOwner").permitAll()
                 )
+
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-                .exceptionHandling(exception -> {});
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);    
 

@@ -26,11 +26,4 @@ public class OwnerEntity {
 
     @Column(name = "phoneNumber")
     private String phoneNumber;
-
-    @PrePersist
-    public void generatedUuid() {
-        if (uuidUser == null) {
-            uuidUser = UUID.randomUUID();
-        }
-    }
 }

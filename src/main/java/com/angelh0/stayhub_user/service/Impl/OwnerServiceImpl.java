@@ -4,16 +4,17 @@ import com.angelh0.stayhub_user.converter.OwnerConverter;
 import com.angelh0.stayhub_user.dto.OwnerDTO;
 import com.angelh0.stayhub_user.entity.OwnerEntity;
 import com.angelh0.stayhub_user.entity.UserEntity;
-import com.angelh0.stayhub_user.exception.error.ExistUser;
 import com.angelh0.stayhub_user.exception.error.NotFoundException;
 import com.angelh0.stayhub_user.repository.OwnerRepository;
 import com.angelh0.stayhub_user.repository.UserRepository;
 import com.angelh0.stayhub_user.service.OwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -28,9 +29,10 @@ public class OwnerServiceImpl implements OwnerService {
     @Autowired
     private OwnerConverter ownerConverter;
 
+    @Transactional
     @Override
-    public OwnerDTO signUpOwner(OwnerDTO ownerDTO) {
-        Optional<UserEntity> userOpt = userRepository.findById(ownerDTO.getUuidUser());
+    public OwnerDTO signUpOwner(OwnerDTO ownerDTO, UUID uuidUser) {
+        Optional<UserEntity> userOpt = userRepository.findByUuidUserAndUuidUser(ownerDTO.getUuidUser(), uuidUser);
         if (userOpt.isEmpty()) {
             throw new NotFoundException("No se ha encontrado ningún usuario");
         }
@@ -55,7 +57,8 @@ public class OwnerServiceImpl implements OwnerService {
         userRepository.save(userEntity);
 
         OwnerEntity ownerEntity = new OwnerEntity();
-        ownerEntity.setUuidUser(userEntity.getUuidUser());
+        ownerEntity.setUser(userEntity);
+        userEntity.setOwnerUser(ownerEntity);
         ownerEntity.setCity(ownerDTO.getCity());
         ownerEntity.setPhoneNumber(ownerDTO.getPhoneNumber());
         ownerRepository.save(ownerEntity);
