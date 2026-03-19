@@ -4,6 +4,7 @@ import com.angelh0.stayhub_user.entity.UserEntity;
 import com.angelh0.stayhub_user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -28,7 +30,7 @@ public class CustomerDetailsService implements UserDetailsService {
         userEntity = userRepository.findByEmail(username);
 
         if (!Objects.isNull(userEntity)) {
-            return new User(userEntity.getEmail(), userEntity.getPassword(), new ArrayList<>());
+            return new User(userEntity.getEmail(), userEntity.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole())));
         } else {
             throw new UsernameNotFoundException("Usuario no encontrado");
         }

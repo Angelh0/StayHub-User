@@ -42,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             username = jwtUtil.extractUsername(jwt);
-        }catch (Exception e) {
+        } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -55,12 +55,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 String uuidUser = jwtUtil.extractUuidUser(jwt);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(uuidUser, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-
-            filterChain.doFilter(request, response);
         }
+
+        filterChain.doFilter(request, response);
     }
 
     public Boolean isAdmin() {

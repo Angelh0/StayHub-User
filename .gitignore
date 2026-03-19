@@ -46,3 +46,5 @@ src/main/java/com/**/grpc/*.java
 
 .DS_Store
 Thumbs.db
+
+.env

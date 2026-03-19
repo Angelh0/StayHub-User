@@ -19,7 +19,7 @@ public class OwnerController {
     @Autowired
     OwnerService ownerService;
 
-    @PostMapping("/SignUpOwner")
+    @PostMapping("/signUpOwner")
     public ResponseEntity<OwnerDTO> signUpOwner(@RequestBody OwnerDTO ownerDTO, Authentication authentication) {
         UUID uuidUser = UUID.fromString(authentication.getPrincipal().toString());
         return ResponseEntity.ok(ownerService.signUpOwner(ownerDTO, uuidUser));
