@@ -40,8 +40,9 @@ public class SecurityConfig {
                 ))
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/v1/signUp", "/api/v1/login", "/api/v1/forgotPassword", "/h2-console-User/**").permitAll()
+                        .requestMatchers("/api/v1/signUp", "/api/v1/login", "/api/v1/forgotPassword", "/h2-console-User/**", "/api/v1/guestAccess").permitAll()
                         .requestMatchers("/api/v1/signUpOwner").hasRole("USER")
+                        .anyRequest().authenticated()
                 )
 
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))

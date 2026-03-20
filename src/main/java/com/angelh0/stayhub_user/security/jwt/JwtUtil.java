@@ -80,4 +80,25 @@ public class JwtUtil {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
+
+    public String generateGuestToken(String uuidGuest, String role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+        claims.put("userUUID", uuidGuest);
+
+        return createGuestToken(claims, uuidGuest);
+    }
+
+    private String createGuestToken(Map<String, Object> claims, String subject) {
+
+        long expirationTime = 1000L * 60 * 60 * 24;
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 }
