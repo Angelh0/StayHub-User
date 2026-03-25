@@ -116,7 +116,9 @@ public class UserServiceImpl implements UserService {
                         userEntity.getEmail(),
                         userEntity.getRole(),
                         userEntity.getUuidUser(),
-                        String.valueOf(userEntity.getUuidUser())
+                        String.valueOf(userEntity.getUuidUser()),
+                        userEntity.getFirstName(),
+                        userEntity.getLastName()
                 );
 
                 return "{\"token\": \"" + token + "\"}";

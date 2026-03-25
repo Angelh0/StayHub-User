@@ -59,10 +59,12 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username, String role, UUID uuidUser, String userUUID) {
+    public String generateToken(String username, String role, UUID uuidUser, String userUUID, String firstName, String lastName) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
         claims.put("userUUID", userUUID);
+        claims.put("firstName", firstName);
+        claims.put("lastName", lastName);
         return createToken(claims, username);
     }
 
@@ -71,7 +73,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 20 * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
