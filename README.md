@@ -4,122 +4,56 @@
 
 🚧 Proyecto en desarrollo
 
-La arquitectura y los componentes evolucionan de forma progresiva conforme se incorporan nuevas funcionalidades y tecnologías.
-Para consultar el código del proyecto se debe acceder al branch "testing"
+✅ **Finalizado**
 
-## 📌 Descripción
+Este repositorio contiene el microservicio de **Usuarios e Identidad**. Actúa como el pilar de seguridad del ecosistema StayHub, funcionando como el proveedor central de identidad y gestionando la autenticación, autorización y el control de acceso estricto basado en roles.
 
-StayHub – User es el microservicio encargado de gestionar usuarios y propietarios dentro del proyecto StayHub.
+---
 
-Este servicio forma parte de la arquitectura basada en microservicios orientada al aprendizaje y el diseño de sistemas backend actuales, simulando el funcionamiento real de una plataforma de gestión de alojamientos y reservas.
+## 🎯 Hitos del microservicio
 
-El objetivo principal de este microservicio es centralizar la lógica relacionada con: 
+### 🛡️ Autenticación JWT y Seguridad
+Se ha implementado un sistema de seguridad robusto basado en `Spring Security` y `JSON Web Tokens`:
+* **Filtros personalizados:** Creación de un `JwtFilter` para validar tokens en cada petición y proteger los endpoints de la API.
+* **Payload optimizado:** Los tokens generados no solo validan el acceso, sino que encriptan información clave en sus *claims* (UUID del usuario, Rol, Nombre y Apellidos). Esto evita que el Frontend o los otros microservicios tengan que hacer peticiones extra a la base de datos para saber quién está navegando.
+* **Configuración CORS:** Ajustes en `SecurityConfig` para permitir la comunicación segura y fluida con la interfaz gráfica (Frontend).
 
-- Registro y autenticación de usuarios
-- Registro de propietarios
-- Asignacióin de roles (User, Owner)
-- Gestión de estados de usuario
-- Validación de datos de registro
-- Generación de tokens JWT para autenticación segura
-- Control de acceso a endpoints según rol
+### 👥 Sistema de roles escalable y jerárquico
+El modelo de dominio está diseñado para gestionar el ciclo de vida del usuario de forma progresiva:
+* **Rol [User]:** Entidad base que representa a un cliente registrado en el sistema.
+* **Rol [Owner] (Upgrade):** Se ha implementado un sistema de escalado donde un `User` existente puede solicitar ser propietario. Esto crea una relación 1:1 con la entidad `OwnerEntity`, añadiendo datos específicos (ciudad, teléfono) sin duplicar credenciales de acceso. El nuevo rol se actualiza dinámicamente en su próximo login.
 
-## 🎯 Responsabilidad del microservicio
+### 🕵️ Sesiones de invitado (Guest Mode)
+Para mejorar la conversión y accesibilidad de la plataforma sin comprometer la seguridad:
+* Se ha implementado el rol temporal `[Guest]`.
+* Permite a los usuarios no registrados acceder a las búsquedas complejas de alojamientos y habitaciones.
+* Al entrar como invitado, el sistema genera dinámicamente un `uuidGuest` y emite un token válido por 24 horas, garantizando la trazabilidad de sus búsquedas y bloqueando el acceso a zonas protegidas (reservas o creación de alojamientos).
 
-Este microservicio cumple con las siguientes responsabilidades:
-- Registrar usuarios y propietarios
-- Autenticar usuarios y propietarios
-- Asignar roles y estados
-- Validar datos de registro
-- Proporcionar tokens JWT para consumo de otros microservicios
-- Manejo de excepciones
+### 🔗 Centralización de la identidad
+Este microservicio es la **fuente de la verdad** para todo el sistema distribuido:
+* Provee la base de identidad inmutable para `StayHub-Accommodation` y `StayHub-Reservation`.
+* Garantiza que las verificaciones de pertenencia de datos (ej: "Solo el creador puede modificar este alojamiento") se basen en UUIDs validados criptográficamente.
 
-Este microservicio no es responsable de: 
-- Gestión de alojamientos o habitaciones
-- Gestión de reservas
-- Validación de disponibilidad
-
-## 🧩 Modelo de dominio
-
-**Usuario**
-
-Representa a un cliente dentro del sistema
-
-Campos principales
-
-- UuidUser: identificador único
-- FirstName, lastName
-- Email, password
-- role
-- status
-- Relación uno a uno con OwnerEntity (esto solo ocurre si el usuario obtiene el rol de propietario)
-
-**Propietario**
-
-Representa a un propietario dentro del sistema
-
-Campos principales
-
-- Mantiene todos los campos nombrados en usuario
-- ciudad
-- telefono
-- Relación uno a uno con UserEntity
-
-## 🔄 Flujo general
-
-**1️⃣ Registro de usuario**
-
-1. Se reciben los datos de registro
-2. Se valida que no exista un usuario con el mismo email
-3. Se crea el UserEntity con rol usuario y estado true
-4. Se almacena en la base de datos
-
-**2️⃣ Registro de propietario**
-
-1. Solo puede realizarlo un cliente previamente registrado como usuario
-2. Se asgina el rol de propietario
-3. Se crea la entidad OwnerEntity vinculada con UserEntity
-4. Se almacenan los datos de ciudad y teléfono
-5. Se obtiene el rol al hacer login y obtener el nuevo token
-
-**3️⃣ Login**
-
-1. Se autentica credenciales mediante AuthenticationManager
-2. Se comprueba el estado del usuario
-3. Se genera un token con:
-   - Email
-   - Rol
-   - Uuid del usuario
-4. El token permite acceso a endpoints protegidos de otros microservicios
-
-## 🔐 Seguridad y control de acceso
-- Autenticación medainte JWT
-- Endpoints accesibles sin token como: signUp, login
-- Control de roles para endpoints específicos
-- Gestión de sesión
-
-## 🔗 Comunicación con otros microservicios
-
-Este microservicio provee información de usuarios y propietarios para: 
-- StayHub - Accommodation (usuarios y propietarios)
-- StayHub - Reservation (usuarios y propietarios)
-
-Actuando como fuente de verdad tanto en indetidad como en roles
+---
 
 ## 🛠️ Tecnologías utilizadas
-- Java
-- Spring Boot
-- Spring Security
-- JWT
-- JPA / Hibernate
-- gRPC
-- REST API
-- JSON
-- H2 (para desarrollo)
-- Git
+* **Lenguaje y Framework:** Java 17, Spring Boot
+* **Seguridad y Acceso:** Spring Security, JWT (JSON Web Tokens)
+* **Persistencia y ORM:** JPA, Hibernate, PostgreSQL (Producción), H2 (Desarrollo y Testing)
+* **Arquitectura y Comunicación:** Patrón Microservicios, API REST, JSON, gRPC
+* **Manejo de Errores:** Excepciones personalizadas centralizadas para el manejo de credenciales inválidas y duplicidad de datos.
+* **DevOps y Despliegue:** Docker, Docker Compose, Git, GitHub.
 
-## 📘 Contexto del proyecto
+---
 
-Este microservicio forma parte del proyecto StayHub, una proyecto backend diseñado con fines de aprendizaje y de arquitectura, orientada a simular escenarios reales utilizados en sistemas de gestión de alojamientos.
+## 🚀 Próximos pasos en StayHub
 
+StayHub se basa en una arquitectura diseñada en la separación de responsabilidades, lo que facilita futuras integraciones como:
 
+* Integración de OAuth2 para inicio de sesión social (Google / GitHub).
+* Sistema de recuperación de contraseñas mediante envío de correos electrónicos.
+* Gestión de perfiles extendidos (subida de avatares).
 
+* 🔐 Integración de OAuth2 para inicio de sesión social (Google / GitHub).
+* ✉️ Sistema de recuperación de contraseñas mediante envío de correos electrónicos.
+* 🖼️ Gestión de perfiles extendidos (subida de avatares).
