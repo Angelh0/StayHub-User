@@ -4,6 +4,7 @@ import com.angelh0.stayhub_user.dto.OwnerDTO;
 import com.angelh0.stayhub_user.entity.OwnerEntity;
 import com.angelh0.stayhub_user.entity.UserEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.Map;
 import java.util.UUID;
@@ -12,5 +13,4 @@ public interface OwnerService {
 
     OwnerDTO signUpOwner(OwnerDTO ownerDTO, UUID uuidUser);
     OwnerEntity getUser(OwnerDTO ownerDTO, UserEntity userEntity);
-    boolean validateSingUp(OwnerDTO ownerDTO);
-}
+    boolean validateSingUp(OwnerDTO ownerDTO);}

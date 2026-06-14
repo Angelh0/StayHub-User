@@ -1,5 +1,7 @@
 package com.angelh0.stayhub_user.service.Impl;
 
+import com.angelh0.stayhub_user.converter.UserConverter;
+import com.angelh0.stayhub_user.dto.UserDTO;
 import com.angelh0.stayhub_user.entity.UserEntity;
 import com.angelh0.stayhub_user.exception.error.InvalidValues;
 import com.angelh0.stayhub_user.repository.UserRepository;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,10 +36,10 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private CustomerDetailsService customerDetailsService;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private UserConverter userConverter;
 
 
     @Autowired
@@ -129,6 +132,19 @@ public class UserServiceImpl implements UserService {
         }
 
         return "{\"mensaje\": \"Credenciales incorrectas\"}";
+    }
+
+    @Override
+    public UserDTO infoUser(UUID uuidUser) {
+        Optional<UserEntity> user = userRepository.findByUuidUser(uuidUser);
+
+        if (user.isPresent()) {
+            UserEntity userEntity = user.get();
+
+            return userConverter.convertToDTO(userEntity);
+        }
+
+        throw new RuntimeException("No se ha encontrado al usuario con UUID: " + uuidUser);
     }
 
 }

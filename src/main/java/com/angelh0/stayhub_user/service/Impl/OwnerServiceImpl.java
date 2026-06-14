@@ -2,6 +2,7 @@ package com.angelh0.stayhub_user.service.Impl;
 
 import com.angelh0.stayhub_user.converter.OwnerConverter;
 import com.angelh0.stayhub_user.dto.OwnerDTO;
+import com.angelh0.stayhub_user.dto.UserDTO;
 import com.angelh0.stayhub_user.entity.OwnerEntity;
 import com.angelh0.stayhub_user.entity.UserEntity;
 import com.angelh0.stayhub_user.exception.error.NotFoundException;
